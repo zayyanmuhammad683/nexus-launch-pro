@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "pdf-lib": "^1.17.1",
+    "formidable": "^3.5.1"
+  }
+}
