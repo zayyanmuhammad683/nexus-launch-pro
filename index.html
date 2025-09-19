@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Launch | Free Online PDF, Image, and Utility Tools</title>
+    <meta name="description" content="A powerful suite of free, browser-based tools. Merge and compress PDFs, convert images, format JSON, generate passwords, and much more. Secure and instant results without uploads.">
+    <meta name="keywords" content="online tools, pdf tools, image compressor, json formatter, password generator, qr code generator, free web tools, browser tools">
+    
+    <!-- PDF LIBRARIES - The magic for client-side PDF tools -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --main-bg-color: #000f14;
+            --navbar-bg-color: #1c222d;
+            --sidebar-bg-color: #12151a;
+            --card-bg-color: #12151a;
+            --text-color-light: #ffffff;
+            --text-color-dark: #bebebe;
+            --accent-cyan-color: #42f8f5;
+            --accent-cyan-glow-color: #424845; /* Used for subtle effects */
+            --glow-shadow: rgba(66, 248, 245, 0.6);
+            --button-bg-color: #12151a;
+            --button-hover-color: #4248f5;
+            --font-family: 'Orbitron', sans-serif;
+            --navbar-height: 75px;
+        }
+
+        /* --- Global Styles & Resets --- */
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--main-bg-color);
+            color: var(--text-color-light);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--navbar-bg-color);
+            padding: 0 2rem;
+            height: var(--navbar-height);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid var(--accent-cyan-glow-color);
+        }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            filter: drop-shadow(0 0 8px var(--glow-shadow));
+            transition: transform 0.4s ease-in-out;
+        }
+        .logo-img:hover { transform: rotate(360deg) scale(1.1); }
+        .logo h1 {
+            font-size: 1.5rem;
+            color: var(--accent-cyan-color);
+            text-shadow: 0 0 10px var(--glow-shadow);
+            margin: 0;
+        }
+        .nav-links { list-style: none; display: flex; gap: 2rem; margin: 0; padding: 0; }
+        .nav-links a {
+            color: var(--text-color-light);
+            text-decoration: none;
+            transition: color 0.3s, text-shadow 0.3s;
+            position: relative;
+            padding: 5px 0;
+            cursor: pointer;
+        }
+        .nav-links a:hover { color: var(--accent-cyan-color); text-shadow: 0 0 10px var(--glow-shadow); }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-cyan-color);
+            transition: width 0.3s ease-in-out;
+            box-shadow: 0 0 10px var(--glow-shadow);
+        }
+        .nav-links a:hover::after { width: 100%; }
+        .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+        .hamburger div { width: 25px; height: 3px; background-color: var(--text-color-light); transition: all 0.3s ease; border-radius: 2px; }
+        .hamburger.toggle .line1 { transform: rotate(-45deg) translate(-5px, 6px); }
+        .hamburger.toggle .line2 { opacity: 0; }
+        .hamburger.toggle .line3 { transform: rotate(45deg) translate(-5px, -6px); }
+
+        /* --- Main Layout Container --- */
+        .container { display: flex; }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background-color: var(--sidebar-bg-color);
+            padding: 1.5rem 1rem;
+            height: calc(100vh - var(--navbar-height));
+            position: sticky;
+            top: var(--navbar-height);
+            box-shadow: 5px 0 15px -5px rgba(0,0,0,0.5), 2px 0 5px -2px var(--glow-shadow);
+            overflow-y: auto;
+        }
+        .tool-sections h3 {
+            color: var(--accent-cyan-color);
+            margin-top: 0; margin-bottom: 1rem;
+            text-shadow: 0 0 5px var(--accent-cyan-color);
+            border-bottom: 1px solid var(--accent-cyan-glow-color);
+            padding-bottom: 0.5rem;
+        }
+        .tool-sections ul { list-style: none; padding: 0; margin-bottom: 2rem; }
+        .tool-sections li a {
+            color: var(--text-color-dark);
+            text-decoration: none;
+            padding: 0.75rem;
+            border-radius: 5px;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .tool-sections li a:hover {
+            background-color: var(--accent-cyan-color);
+            color: #000;
+            font-weight: 500;
+            text-shadow: none;
+            transform: translateX(5px);
+            box-shadow: 0 0 10px var(--glow-shadow);
+        }
+
+        /* --- Main Content --- */
+        .main-content { flex-grow: 1; padding: 2.5rem; }
+        .hero { text-align: center; margin-bottom: 4rem; }
+        .hero h2 { font-size: 3.5rem; color: var(--accent-cyan-color); text-shadow: 0 0 15px var(--glow-shadow); margin-bottom: 1rem; }
+        .hero p { font-size: 1.2rem; color: var(--text-color-dark); max-width: 600px; margin: auto; }
+        .cta-button {
+            background: transparent; color: var(--accent-cyan-color); border: 2px solid var(--accent-cyan-color);
+            padding: 0.8rem 1.8rem; border-radius: 5px; text-decoration: none;
+            transition: all 0.3s ease; font-family: var(--font-family); font-size: 1rem; cursor: pointer;
+            margin-top: 1.5rem; display: inline-block; font-weight: 500;
+        }
+        .cta-button:hover {
+            background-color: var(--button-hover-color); color: var(--text-color-light);
+            border-color: var(--button-hover-color); box-shadow: 0 0 15px var(--glow-shadow);
+        }
+
+        /* --- Tools Grid --- */
+        #tools { scroll-margin-top: calc(var(--navbar-height) + 20px); }
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+        .tool-card {
+            background-color: var(--card-bg-color);
+            padding: 1.5rem; border-radius: 10px;
+            border: 1px solid var(--accent-cyan-glow-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            display: flex; flex-direction: column;
+        }
+        .tool-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-cyan-color);
+            box-shadow: 0 0 20px var(--glow-shadow);
+        }
+        .tool-card h3 { margin-top: 0; color: var(--accent-cyan-color); }
+        .tool-card p { color: var(--text-color-dark); line-height: 1.6; flex-grow: 1; }
+        .open-tool-btn {
+            background: var(--button-bg-color); color: var(--accent-cyan-color);
+            border: 1px solid var(--accent-cyan-color); padding: 0.6rem 1rem; border-radius: 5px;
+            cursor: pointer; width: 100%; margin-top: 1rem; transition: all 0.3s ease; font-family: var(--font-family);
+        }
+        .open-tool-btn:hover {
+            background-color: var(--button-hover-color); border-color: var(--button-hover-color);
+            color: var(--text-color-light); box-shadow: 0 0 10px var(--glow-shadow);
+        }
+
+        /* --- Footer --- */
+        .footer {
+            background-color: var(--sidebar-bg-color); border-top: 2px solid var(--accent-cyan-color);
+            box-shadow: 0 -2px 10px var(--glow-shadow); padding: 1.5rem 2rem; margin-top: 3rem;
+        }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .footer p { margin: 0; color: var(--text-color-dark); }
+        .footer-links a {
+            color: var(--text-color-dark); text-decoration: none;
+            transition: color 0.3s, text-shadow 0.3s; margin: 0 10px; cursor: pointer;
+        }
+        .footer-links a:hover { color: var(--accent-cyan-color); text-shadow: 0 0 5px var(--glow-shadow); }
+        .social-icons a { margin-left: 1rem; }
+        .social-icons svg {
+            width: 24px; height: 24px; fill: var(--text-color-dark);
+            transition: fill 0.3s, filter 0.3s, transform 0.3s;
+        }
+        .social-icons a:hover svg {
+            fill: var(--accent-cyan-color);
+            filter: drop-shadow(0 0 5px var(--glow-shadow));
+            transform: scale(1.1);
+        }
+        
+        /* --- Modal --- */
+        .modal {
+            display: none; position: fixed; z-index: 1001; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 15, 20, 0.8);
+            backdrop-filter: blur(5px); animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-content {
+            background-color: var(--sidebar-bg-color); margin: 5% auto; padding: 2rem;
+            border: 1px solid var(--accent-cyan-color); width: 90%; max-width: 700px;
+            border-radius: 10px; box-shadow: 0 0 25px var(--glow-shadow);
+            animation: slideIn 0.4s ease; position: relative;
+        }
+        @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .close-modal {
+            color: #aaa; position: absolute; top: 10px; right: 20px;
+            font-size: 28px; font-weight: bold; transition: color 0.3s, transform 0.3s;
+        }
+        .close-modal:hover, .close-modal:focus { color: var(--accent-cyan-color); text-decoration: none; cursor: pointer; transform: scale(1.2); }
+
+        /* --- Modal Tool Specific Styles --- */
+        #modal-body label { display: block; margin: 10px 0 5px; color: var(--text-color-dark); font-weight: 500; }
+        #modal-body input, #modal-body textarea, #modal-body select {
+            width: 100%; padding: 12px; margin-bottom: 12px; background-color: var(--main-bg-color);
+            border: 1px solid var(--accent-cyan-glow-color); color: var(--text-color-light); border-radius: 5px;
+            box-sizing: border-box; font-family: 'Orbitron', sans-serif; transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        #modal-body input:focus, #modal-body textarea:focus, #modal-body select:focus {
+             border-color: var(--accent-cyan-color); outline: none; box-shadow: 0 0 10px var(--glow-shadow);
+        }
+        #modal-body input[type="color"] { height: 50px; padding: 5px; }
+        #modal-body input[type="range"] { padding: 0; }
+        .tool-button { background: var(--button-bg-color); color: var(--accent-cyan-color); border: 1px solid var(--accent-cyan-color); padding: 0.6rem 1.2rem; border-radius: 5px; cursor: pointer; width: auto; margin-top: 10px; transition: all 0.3s ease; display: inline-block; text-decoration: none; text-align: center; }
+        .tool-button:hover { background-color: var(--button-hover-color); border-color: var(--button-hover-color); color: var(--text-color-light); box-shadow: 0 0 10px var(--glow-shadow); }
+        .tool-button:disabled { background-color: #333; color: #888; border-color: #555; cursor: not-allowed; }
+        #modal-body .file-drop-area { border: 2px dashed var(--accent-cyan-glow-color); border-radius: 5px; padding: 30px; text-align: center; margin-bottom: 15px; cursor: pointer; transition: background-color 0.3s, border-color 0.3s; }
+        #modal-body .file-drop-area.dragover { background-color: #4248f522; border-color: var(--accent-cyan-color); }
+        #modal-body #stopwatch-display {
+            font-size: 3rem; text-align: center; margin: 10px 0; color: var(--accent-cyan-color); 
+            text-shadow: 0 0 10px var(--glow-shadow); letter-spacing: 2px;
+            word-break: break-all;
+        }
+        #modal-body .button-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .backend-note { color: var(--accent-cyan-color); border: 1px solid var(--accent-cyan-color); padding: 1rem; border-radius: 5px; background-color: rgba(66, 248, 245, 0.1); }
+        #modal-body #json-input.error { border-color: #ff3b3b; box-shadow: 0 0 10px rgba(255, 59, 59, 0.6); }
+        .converter-grid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 1rem; }
+        .converter-grid p { text-align: center; font-size: 2rem; margin: 0 0 12px; }
+        #unit-result { font-size: 1.5rem; text-align: center; margin-top: 20px; color: var(--accent-cyan-color); text-shadow: 0 0 8px var(--glow-shadow); min-height: 1.5rem; }
+        #modal-body .file-input-container {
+            background-color: var(--main-bg-color);
+            border: 1px solid var(--accent-cyan-glow-color);
+            border-radius: 5px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        #modal-body input[type="file"] { display: none; }
+        #modal-body .file-input-label {
+            background-color: var(--card-bg-color);
+            padding: 4px 10px;
+            border-radius: 3px;
+            border: 1px solid var(--accent-cyan-glow-color);
+        }
+        #modal-body .file-count-display {
+            color: var(--text-color-dark);
+            font-style: italic;
+            padding-left: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        /* --- Responsive Design --- */
+        @media screen and (max-width: 1200px) {
+            .tools-grid { grid-template-columns: repeat(3, 1fr); }
+            .sidebar { width: 250px; }
+        }
+        @media screen and (max-width: 992px) {
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .nav-links {
+                display: none; position: absolute; top: var(--navbar-height); left: 0;
+                flex-direction: column; width: 100%; background-color: var(--navbar-bg-color);
+                text-align: center; padding: 1rem 0; box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+            }
+            .nav-links.active { display: flex; }
+            .nav-links li { padding: 1rem 0; }
+            .hamburger { display: flex; }
+            .container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: static; box-shadow: 0 5px 15px -5px rgba(0,0,0,0.5); }
+        }
+        @media screen and (max-width: 576px) {
+            .tools-grid { grid-template-columns: 1fr; }
+            .footer-content { flex-direction: column; text-align: center; }
+            .logo h1 { font-size: 1.2rem; }
+            .main-content { padding: 1.5rem; }
+            .hero h2 { font-size: 2.5rem; }
+            .modal-content { margin: 20px auto; padding: 1.5rem;}
+            #modal-body #stopwatch-display { font-size: 2.2rem; }
+            .converter-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+            .converter-grid p { transform: rotate(90deg); margin: 0 auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="navbar">
+        <div class="logo">
+            <svg class="logo-img" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="logoTitle">
+                <title id="logoTitle">Nexus Launch Logo</title>
+                <defs>
+                    <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                        <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#42f8f5;stop-opacity:1" />
+                    </radialGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <circle cx="50" cy="50" r="45" stroke="#42f8f5" stroke-width="3" fill="none" filter="url(#glow)"/>
+                <path d="M50 20 V35 M50 65 V80 M20 50 H35 M65 50 H80" stroke="url(#grad1)" stroke-width="4" />
+                <path d="M35 35 L45 45 M55 55 L65 65 M35 65 L45 55 M55 45 L65 35" stroke="#42f8f5" stroke-width="2.5" />
+                <circle cx="50" cy="50" r="10" fill="url(#grad1)"/>
+            </svg>
+            <h1>Nexus Launch</h1>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a data-tool="home">Home</a></li>
+                <li><a href="#tools">Tools</a></li>
+                <li><a data-tool="about">About</a></li>
+                <li><a data-tool="contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="hamburger" role="button" aria-label="Toggle Navigation Menu">
+            <div class="line1"></div>
+            <div class="line2"></div>
+            <div class="line3"></div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="tool-sections">
+                <h3>PDF Tools</h3>
+                <ul>
+                    <li><a data-tool="merge-pdf">Merge PDF</a></li>
+                    <li><a data-tool="split-pdf">Split PDF</a></li>
+                    <li><a data-tool="compress-pdf">Compress PDF</a></li>
+                    <li><a data-tool="pdf-to-word">PDF to Word</a></li>
+                    <li><a data-tool="pdf-to-jpg">PDF to JPG</a></li>
+                    <li><a data-tool="unlock-pdf">Unlock PDF</a></li>
+                </ul>
+                <h3>Image Tools</h3>
+                <ul>
+                    <li><a data-tool="image-compressor">Image Compressor</a></li>
+                    <li><a data-tool="image-converter">Image Converter</a></li>
+                </ul>
+                <h3>Text Tools</h3>
+                <ul>
+                    <li><a data-tool="word-counter">Word & Character Counter</a></li>
+                    <li><a data-tool="json-formatter">JSON Formatter</a></li>
+                    <li><a data-tool="text-to-speech">Text to Speech</a></li>
+                    <li><a data-tool="speech-to-text">Speech to Text</a></li>
+                </ul>
+                <h3>Utility Tools</h3>
+                <ul>
+                    <li><a data-tool="qr-generator">QR Code Generator</a></li>
+                    <li><a data-tool="password-generator">Password Generator</a></li>
+                    <li><a data-tool="age-calculator">Age Calculator</a></li>
+                    <li><a data-tool="bmi-calculator">BMI Calculator</a></li>
+                    <li><a data-tool="color-picker">Color Picker</a></li>
+                    <li><a data-tool="unit-converter">Unit Converter</a></li>
+                    <li><a data-tool="timer-stopwatch">Timer / Stopwatch</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h2>The Future of Web Tools is Here</h2>
+                <p>Access a powerful suite of PDF, Image, and Utility tools, all running securely in your browser. No uploads, no waiting. Just instant results.</p>
+                <a href="#tools" class="cta-button">Explore Tools</a>
+            </section>
+
+            <!-- Tools Grid -->
+            <section id="tools">
+                <h2 style="position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); border: 0;">Tools</h2>
+                <div class="tools-grid">
+                    <!-- Cards will be populated here dynamically by JS for maintainability -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Nexus Launch. All Rights Reserved.</p>
+            <div class="footer-links">
+                <a data-tool="privacy">Privacy Policy</a> |
+                <a data-tool="terms">Terms</a> |
+                <a data-tool="contact">Contact</a>
+            </div>
+            <div class="social-icons">
+                <a href="#" aria-label="Github"><svg viewBox="0 0 24 24" role="img"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+                <a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24" role="img"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616v.064c0 2.293 1.634 4.212 3.793 4.649-.65.177-1.336.216-2.029.176.606 1.884 2.364 3.256 4.453 3.293-1.776 1.39-4.015 2.215-6.456 2.215-.42 0-.835-.025-1.243-.073 2.289 1.465 5.013 2.32 7.942 2.32 9.462 0 14.643-7.84 14.643-14.643 0-.223-.005-.446-.014-.668.998-.722 1.868-1.62 2.56-2.658z"/></svg></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal Container -->
+    <div id="tool-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" role="button" aria-label="Close Modal">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- Data Source for Tools ---
+        const toolsData = [
+            { id: 'merge-pdf', category: 'PDF Tools', title: 'Merge PDF', description: 'Combine multiple PDF files into one single document.', backend: true },
+            { id: 'split-pdf', category: 'PDF Tools', title: 'Split PDF', description: 'Extract a range of pages or every page into separate PDF files.', backend: false },
+            { id: 'compress-pdf', category: 'PDF Tools', title: 'Compress PDF', description: 'Reduce the file size of your PDF while maintaining quality.', backend: true },
+            { id: 'pdf-to-word', category: 'PDF Tools', title: 'PDF to Word', description: 'Convert your PDF files to editable Word documents.', backend: true },
+            { id: 'pdf-to-jpg', category: 'PDF Tools', title: 'PDF to JPG', description: 'Convert each page of a PDF into a high-quality JPG image.', backend: false },
+            { id: 'unlock-pdf', category: 'PDF Tools', title: 'Unlock PDF', description: 'Remove password and restrictions from protected PDF files.', backend: true },
+            { id: 'image-compressor', category: 'Image Tools', title: 'Image Compressor', description: 'Optimize JPG, PNG, & WEBP images with the best compression.', backend: false },
+            { id: 'image-converter', category: 'Image Tools', title: 'Image Converter', description: 'Convert images between JPG, PNG, and WEBP formats.', backend: false },
+            { id: 'word-counter', category: 'Text Tools', title: 'Word Counter', description: 'Count words and characters in your text in real-time.', backend: false },
+            { id: 'json-formatter', category: 'Text Tools', title: 'JSON Formatter', description: 'Validate, format, and beautify your JSON data for readability.', backend: false },
+            { id: 'text-to-speech', category: 'Text Tools', title: 'Text to Speech', description: 'Convert written text into natural-sounding speech.', backend: false },
+            { id: 'speech-to-text', category: 'Text Tools', title: 'Speech to Text', description: 'Transcribe your spoken words into text using your mic.', backend: false },
+            { id: 'qr-generator', category: 'Utility Tools', title: 'QR Code Generator', description: 'Create custom QR codes for URLs, text, Wi-Fi, and more.', backend: false },
+            { id: 'password-generator', category: 'Utility Tools', title: 'Password Generator', description: 'Generate secure, strong, and random passwords.', backend: false },
+            { id: 'age-calculator', category: 'Utility Tools', title: 'Age Calculator', description: 'Calculate your age accurately down to the day.', backend: false },
+            { id: 'bmi-calculator', category: 'Utility Tools', title: 'BMI Calculator', description: 'Calculate your Body Mass Index to assess your weight.', backend: false },
+            { id: 'color-picker', category: 'Utility Tools', title: 'Color Picker', description: 'Pick a color and get its HEX, RGB, and HSL values.', backend: false },
+            { id: 'unit-converter', category: 'Utility Tools', title: 'Unit Converter', description: 'Convert between various units of measurement.', backend: false },
+            { id: 'timer-stopwatch', category: 'Utility Tools', title: 'Timer / Stopwatch', description: 'A precise and easy-to-use timer and stopwatch.', backend: false },
+        ];
+        
+        // --- Dynamic Content Population ---
+        const toolsGrid = document.querySelector('.tools-grid');
+        if (toolsGrid) {
+            toolsData.forEach(tool => {
+                const card = document.createElement('div');
+                card.className = 'tool-card';
+                card.dataset.tool = tool.id;
+                card.innerHTML = `
+                    <h3>${tool.title}</h3>
+                    <p>${tool.description}</p>
+                    <button class="open-tool-btn" data-tool="${tool.id}">Open Tool</button>
+                `;
+                toolsGrid.appendChild(card);
+            });
+        }
+
+        // --- Basic UI Interactivity ---
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('toggle');
+        });
+
+        // --- Modal Handling ---
+        const modal = document.getElementById('tool-modal');
+        const modalBody = document.getElementById('modal-body');
+        const closeModalBtn = document.querySelector('.close-modal');
+
+        const openModal = (toolId) => {
+            if (toolId === 'home') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+            if (!toolId) return;
+
+            modalBody.innerHTML = getToolHTML(toolId);
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            attachToolListeners(toolId);
+        };
+
+        const closeModal = () => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            window.speechSynthesis.cancel(); 
+            if (window.recognition && window.recognition.abort) {
+                window.recognition.abort();
+            }
+        };
+
+        document.body.addEventListener('click', (e) => {
+             if (e.target.dataset.tool) {
+                e.preventDefault();
+                openModal(e.target.dataset.tool);
+             }
+        });
+
+        closeModalBtn.addEventListener('click', closeModal);
+        window.addEventListener('click', (e) => { if (e.target == modal) closeModal(); });
+        window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display === 'block') closeModal(); });
+
+        // --- Tool HTML Templates ---
+        const getToolHTML = (toolId) => {
+            const tool = toolsData.find(t => t.id === toolId) || {};
+            const toolTitle = tool.title || toolId.charAt(0).toUpperCase() + toolId.slice(1);
+            const serverRequiredMessage = `<h2>${toolTitle}</h2><div class="backend-note"><p><strong>Server-Side Tool Notice:</strong></p><p>This advanced tool requires a dedicated server for processing and is not available in the client-side version.</p></div>`;
+            
+            if (toolId === 'about') return `<h2>About Nexus Launch</h2><p>Nexus Launch is a demonstration of a futuristic, responsive web application built using only client-side technologies: HTML, CSS, and Vanilla JavaScript. It showcases what's possible in modern browsers without reliance on backend frameworks or libraries for many common utilities.</p><p>Our goal is to provide a sleek, fast, and accessible hub of tools for everyday tasks.</p>`;
+            if (toolId === 'contact') return `<h2>Contact Us</h2><p>For inquiries, feedback, or suggestions, please reach out to us via email at <a href="mailto:zayyansensetech@gmail.com" style="color: var(--accent-cyan-color);">zayyansensetech@gmail.com</a>.</p><p>We appreciate your input!</p>`;
+            if (toolId === 'privacy') return `<h2>Privacy Policy</h2><p>Your privacy is paramount. Nexus Launch operates entirely within your browser. No files are uploaded to any server, and no data is collected. All processing happens on your own device, ensuring your information remains private and secure.</p>`;
+            if (toolId === 'terms') return `<h2>Terms of Service</h2><p>Nexus Launch is provided as-is for demonstration and personal use. By using this tool hub, you agree not to use it for any illegal or unauthorized purpose. The creators are not liable for any issues or data loss that may arise from its use.</p>`;
+
+            // This logic now correctly separates server-only tools from client-side tools
+            if (tool.backend) {
+                if (toolId === 'merge-pdf') {
+                     return `<h2>Merge PDF Files</h2>
+                            <form id="merge-pdf-form">
+                                <label><b>Select two or more PDF files to combine:</b></label>
+                                <label for="merge-files" class="file-input-container">
+                                    <span class="file-input-label">Choose files</span>
+                                    <span class="file-count-display">No files chosen</span>
+                                </label>
+                                <input type="file" name="files" id="merge-files" accept=".pdf" multiple required>
+                                <button type="submit" class="tool-button">Merge PDFs</button>
+                            </form>
+                            <div id="result-area" style="margin-top: 20px;"></div>`;
+                }
+                return serverRequiredMessage;
+            }
+
+            // Client-side tools
+            switch (toolId) {
+                case 'split-pdf':
+                    return `<h2>Split PDF</h2>
+                            <form id="split-pdf-form">
+                                <label>Select a PDF file:</label>
+                                <label for="split-file" class="file-input-container">
+                                    <span class="file-input-label">Choose file</span>
+                                    <span class="file-count-display">No file chosen</span>
+                                </label>
+                                <input type="file" name="file" id="split-file" accept=".pdf" required>
+                                <label for="range">Pages to Extract (e.g., 1-3, 5):</label>
+                                <input type="text" name="range" id="range" placeholder="e.g., 1-3, 5, 7" required>
+                                <button type="submit" class="tool-button">Split PDF</button>
+                            </form>
+                            <div id="result-area" style="margin-top: 20px;"></div>`;
+                case 'pdf-to-jpg':
+                     return `<h2>PDF to JPG</h2>
+                            <form id="pdf-to-jpg-form">
+                                <label>Select a PDF file to convert:</label>
+                                <label for="jpg-file" class="file-input-container">
+                                    <span class="file-input-label">Choose file</span>
+                                    <span class="file-count-display">No file chosen</span>
+                                </label>
+                                <input type="file" name="file" id="jpg-file" accept=".pdf" required>
+                                <p style="color: var(--text-color-dark); font-size: 0.9em;">Note: Large PDFs may take a moment to process directly on your device.</p>
+                                <button type="submit" class="tool-button">Convert to JPG</button>
+                            </form>
+                            <div id="result-area" style="margin-top: 20px;"></div>`;
+                case 'image-compressor': return `<h2>Image Compressor</h2><div class="file-drop-area" id="compress-drop-area"><p>Drag & Drop an image here, or click to select</p><input type="file" id="compress-file-input" accept="image/jpeg,image/png,image/webp" hidden></div><label for="quality-slider">Quality (JPEG/WEBP): <span id="quality-value">75</span>%</label><input type="range" id="quality-slider" min="1" max="100" step="1" value="75"><div id="compress-result"></div>`;
+                case 'image-converter': return `<h2>Image Converter</h2><div class="file-drop-area" id="convert-drop-area"><p>Drag & Drop an image here, or click to select</p><input type="file" id="convert-file-input" accept="image/*" hidden></div><label for="convert-format">Convert to:</label><select id="convert-format"><option value="image/png">PNG</option><option value="image/jpeg">JPEG</option><option value="image/webp">WEBP</option></select><div id="convert-result"></div>`;
+                case 'qr-generator': return `<h2>QR Code Generator</h2><label for="qr-text">Text or URL:</label><input type="text" id="qr-text" placeholder="e.g., https://www.google.com"><div id="qrcode" style="margin-top:20px; text-align:center;"></div>`;
+                case 'password-generator': return `<h2>Password Generator</h2><label for="password-length">Length: <span id="pass-length-val">16</span></label><input type="range" id="password-length" value="16" min="8" max="64"><div id="generated-password" style="background:var(--main-bg-color); padding:15px; border-radius:5px; margin-top:10px; word-break:break-all; text-align:center; font-size:1.2rem; cursor:pointer;" title="Click to copy"></div><button class="tool-button" id="generate-password">Generate New</button>`;
+                case 'word-counter': return `<h2>Word & Character Counter</h2><textarea id="text-input" rows="8" placeholder="Start typing here..."></textarea><p style="text-align:center;">Words: <span id="word-count">0</span> | Characters: <span id="char-count">0</span></p>`;
+                case 'json-formatter': return `<h2>JSON Formatter</h2><textarea id="json-input" rows="10" placeholder="Paste your JSON here..."></textarea><button id="format-json" class="tool-button">Format / Validate</button>`;
+                case 'color-picker': return `<h2>Color Picker</h2><div style="display:flex; align-items:center; gap:20px;"><input type="color" id="color-input" value="#42f8f5" style="width:100px; height:100px; border:none; background:none; padding:0; cursor:pointer;"><div id="color-values" style="flex-grow:1;"></div></div>`;
+                case 'age-calculator': return `<h2>Age Calculator</h2><label for="birthdate">Enter your date of birth:</label><input type="date" id="birthdate"><button class="tool-button" id="calculate-age">Calculate Age</button><p id="age-result" style="font-size: 1.5rem; text-align:center; margin-top:20px;"></p>`;
+                case 'bmi-calculator': return `<h2>BMI Calculator</h2><label for="height">Height (cm):</label><input type="number" id="height" placeholder="e.g., 175"><label for="weight">Weight (kg):</label><input type="number" id="weight" placeholder="e.g., 70"><button class="tool-button" id="calculate-bmi">Calculate BMI</button><p id="bmi-result" style="font-size: 1.5rem; text-align:center; margin-top:20px;"></p>`;
+                case 'text-to-speech': return `<h2>Text to Speech</h2><textarea id="tts-input" rows="6">Hello from Nexus Launch! This text is being read by your browser's speech synthesis engine.</textarea><div class="button-group"><button id="speak-btn" class="tool-button">Speak</button><button id="download-tts-btn" class="tool-button" disabled title="Must be on a secure (https) site to enable download.">Download Speech</button></div><div id="tts-status" style="text-align: center; margin-top: 10px; color: var(--text-color-dark);"></div>`;
+                case 'speech-to-text': return `<h2>Speech to Text</h2><button id="stt-btn" class="tool-button">Start Listening</button><p id="stt-result" style="background:var(--main-bg-color); padding:10px; border-radius:5px; min-height: 50px;"></p><p id="stt-error" style="color: #ff3b3b; text-align:center;"></p>`;
+                case 'timer-stopwatch': return `<h2>Timer / Stopwatch</h2><div id="stopwatch-display">00:00:000</div><div class="button-group"><button id="start-stop-btn" class="tool-button">Start</button><button id="reset-btn" class="tool-button">Reset</button></div>`;
+                case 'unit-converter': return `<h2>Unit Converter</h2>
+                                                <label for="unit-category">Select Category:</label>
+                                                <select id="unit-category">
+                                                    <option value="length">Length</option>
+                                                    <option value="weight">Weight</option>
+                                                    <option value="temperature">Temperature</option>
+                                                </select>
+                                                <div class="converter-grid">
+                                                    <div>
+                                                        <label for="from-unit">From</label>
+                                                        <select id="from-unit"></select>
+                                                        <input type="number" id="unit-input" value="1">
+                                                    </div>
+                                                    <p>=</p>
+                                                    <div>
+                                                        <label for="to-unit">To</label>
+                                                        <select id="to-unit"></select>
+                                                        <div id="unit-result"></div>
+                                                    </div>
+                                                </div>`;
+                default: return `<h2>${toolTitle}</h2><p>This tool is coming soon!</p>`;
+            }
+        };
+
+        // --- Tool Logic and Event Listeners ---
+        const attachToolListeners = (toolId) => {
+            const resultArea = document.getElementById('result-area');
+            const showLoading = (btn) => {
+                btn.disabled = true;
+                btn.textContent = 'Processing...';
+                if (resultArea) resultArea.innerHTML = '<p>Loading your file(s), please wait...</p>';
+            };
+            const hideLoading = (btn, originalText) => {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            };
+            const showError = (message) => {
+                if(resultArea) resultArea.innerHTML = `<p style="color: #ff3b3b;">Error: ${message}</p>`;
+            };
+            const createDownloadLink = (blob, filename) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.className = 'tool-button';
+                a.textContent = `Download ${filename}`;
+                return a;
+            };
+            const setupFileInputListener = (form) => {
+                const fileInput = form.querySelector('input[type="file"]');
+                const fileCountDisplay = form.querySelector('.file-count-display');
+                if (!fileInput || !fileCountDisplay) return;
+
+                fileInput.addEventListener('change', () => {
+                    const files = fileInput.files;
+                    if (files.length === 1) {
+                        fileCountDisplay.textContent = files[0].name;
+                    } else if (files.length > 1) {
+                        fileCountDisplay.textContent = `${files.length} files selected`;
+                    } else {
+                        fileCountDisplay.textContent = fileInput.multiple ? 'No files chosen' : 'No file chosen';
+                    }
+                });
+            };
+            
+            // =======================================================
+            // START: REPLACEMENT FOR 'MERGE PDF'
+            // =======================================================
+            if (toolId === 'merge-pdf') {
+                const form = document.getElementById('merge-pdf-form');
+                setupFileInputListener(form);
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = form.querySelector('button');
+                    const files = form.querySelector('input[type="file"]').files;
+                    
+                    if (files.length < 2) {
+                        showError("Please select at least two PDF files.");
+                        return;
+                    }
+
+                    showLoading(btn);
+
+                    const formData = new FormData();
+                    for (let i = 0; i < files.length; i++) {
+                        formData.append('files', files[i]);
+                    }
+
+                    try {
+                        // Send files to the Replit server endpoint
+                        const response = await fetch('/api/merge-pdf', {
+                            method: 'POST',
+                            body: formData,
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json().catch(() => ({ error: `Server error: ${response.statusText}` }));
+                            throw new Error(errorData.error);
+                        }
+
+                        const blob = await response.blob();
+                        
+                        resultArea.innerHTML = '<p>Your merged PDF is ready!</p>';
+                        resultArea.appendChild(createDownloadLink(blob, 'merged.pdf'));
+
+                    } catch (err) {
+                        showError(err.message);
+                    } finally {
+                        hideLoading(btn, 'Merge PDFs');
+                    }
+                });
+            }
+            // =======================================================
+            // END: REPLACEMENT FOR 'MERGE PDF'
+            // =======================================================
+            else if (toolId === 'split-pdf') {
+                const form = document.getElementById('split-pdf-form');
+                setupFileInputListener(form);
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = form.querySelector('button');
+                    showLoading(btn);
+                    try {
+                        const { PDFDocument } = PDFLib;
+                        const file = form.querySelector('input[type="file"]').files[0];
+                        const rangeText = form.querySelector('#range').value;
+                        if (!file) throw new Error("Please select a PDF file.");
+                        if (!rangeText) throw new Error("Please enter a page range.");
+
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdfDoc = await PDFDocument.load(arrayBuffer);
+                        const newPdf = await PDFDocument.create();
+                        
+                        const pageIndices = rangeText.split(',').flatMap(p => {
+                            if (p.includes('-')) {
+                                const [start, end] = p.split('-').map(Number);
+                                return Array.from({ length: end - start + 1 }, (_, i) => start + i - 1);
+                            }
+                            return Number(p) - 1;
+                        }).filter(p => p >= 0 && p < pdfDoc.getPageCount());
+
+                        if (pageIndices.length === 0) throw new Error("Invalid page range.");
+
+                        const copiedPages = await newPdf.copyPages(pdfDoc, pageIndices);
+                        copiedPages.forEach(page => newPdf.addPage(page));
+
+                        const newPdfBytes = await newPdf.save();
+                        const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+                        resultArea.innerHTML = '<p>Your split PDF is ready!</p>';
+                        resultArea.appendChild(createDownloadLink(blob, 'split.pdf'));
+                    } catch (err) {
+                        showError(err.message);
+                    } finally {
+                        hideLoading(btn, 'Split PDF');
+                    }
+                });
+            } else if (toolId === 'pdf-to-jpg') {
+                const form = document.getElementById('pdf-to-jpg-form');
+                 setupFileInputListener(form);
+                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js`;
+
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = form.querySelector('button');
+                    showLoading(btn);
+                    try {
+                        const file = form.querySelector('input[type="file"]').files[0];
+                        if (!file) throw new Error("Please select a PDF file.");
+                        
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                        resultArea.innerHTML = '<p>Your JPG files are ready!</p>';
+
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const viewport = page.getViewport({ scale: 1.5 });
+                            const canvas = document.createElement('canvas');
+                            const context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+                            await page.render({ canvasContext: context, viewport: viewport }).promise;
+                            
+                            canvas.toBlob(blob => {
+                                resultArea.appendChild(createDownloadLink(blob, `page_${i}.jpg`));
+                            }, 'image/jpeg', 0.9);
+                        }
+                    } catch (err) {
+                        showError(err.message);
+                    } finally {
+                        hideLoading(btn, 'Convert to JPG');
+                    }
+                });
+            } else if (toolId === 'unit-converter') {
+                const categorySelect = document.getElementById('unit-category');
+                const fromSelect = document.getElementById('from-unit');
+                const toSelect = document.getElementById('to-unit');
+                const input = document.getElementById('unit-input');
+                const resultDiv = document.getElementById('unit-result');
+
+                const units = {
+                    length: { 'Meters (m)': 1, 'Kilometers (km)': 1000, 'Centimeters (cm)': 0.01, 'Millimeters (mm)': 0.001, 'Miles (mi)': 1609.34, 'Yards (yd)': 0.9144, 'Feet (ft)': 0.3048, 'Inches (in)': 0.0254 },
+                    weight: { 'Grams (g)': 1, 'Kilograms (kg)': 1000, 'Milligrams (mg)': 0.001, 'Pounds (lb)': 453.592, 'Ounces (oz)': 28.3495 },
+                    temperature: { 'Celsius (°C)': 'celsius', 'Fahrenheit (°F)': 'fahrenheit', 'Kelvin (K)': 'kelvin' }
+                };
+
+                const populateSelects = () => {
+                    const category = categorySelect.value;
+                    const options = Object.keys(units[category]);
+                    fromSelect.innerHTML = '';
+                    toSelect.innerHTML = '';
+                    options.forEach((option) => {
+                        fromSelect.innerHTML += `<option value="${option}">${option}</option>`;
+                        toSelect.innerHTML += `<option value="${option}">${option}</option>`;
+                    });
+                    toSelect.selectedIndex = options.length > 1 ? 1 : 0;
+                };
+
+                const convert = () => {
+                    const category = categorySelect.value;
+                    const fromUnit = fromSelect.value;
+                    const toUnit = toSelect.value;
+                    const value = parseFloat(input.value);
+                    if (isNaN(value)) {
+                        resultDiv.textContent = ''; return;
+                    }
+                    let result;
+                    if (category === 'temperature') {
+                        let tempInC;
+                        if (fromUnit.includes('Celsius')) tempInC = value;
+                        else if (fromUnit.includes('Fahrenheit')) tempInC = (value - 32) * 5 / 9;
+                        else if (fromUnit.includes('Kelvin')) tempInC = value - 273.15;
+                        if (toUnit.includes('Celsius')) result = tempInC;
+                        else if (toUnit.includes('Fahrenheit')) result = (tempInC * 9 / 5) + 32;
+                        else if (toUnit.includes('Kelvin')) result = tempInC + 273.15;
+                    } else {
+                        const fromFactor = units[category][fromUnit];
+                        const toFactor = units[category][toUnit];
+                        result = (value * fromFactor) / toFactor;
+                    }
+                    resultDiv.textContent = parseFloat(result.toFixed(6));
+                };
+
+                categorySelect.addEventListener('change', () => { populateSelects(); convert(); });
+                fromSelect.addEventListener('change', convert);
+                toSelect.addEventListener('change', convert);
+                input.addEventListener('input', convert);
+                populateSelects();
+                convert();
+            }
+            
+            const setupDragDrop = (areaId, inputId, onFile) => {
+                const dropArea = document.getElementById(areaId);
+                const fileInput = document.getElementById(inputId);
+                if (!dropArea) return;
+                dropArea.onclick = () => fileInput.click();
+                fileInput.onchange = () => onFile(fileInput.files[0]);
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => dropArea.addEventListener(eventName, e => {e.preventDefault(); e.stopPropagation();}));
+                ['dragenter', 'dragover'].forEach(eventName => dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover')));
+                ['dragleave', 'drop'].forEach(eventName => dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover')));
+                dropArea.addEventListener('drop', e => onFile(e.dataTransfer.files[0]));
+            };
+
+            if (toolId === 'image-compressor' || toolId === 'image-converter') {
+                const isCompressor = toolId === 'image-compressor';
+                const dropAreaId = isCompressor ? 'compress-drop-area' : 'convert-drop-area';
+                const inputId = isCompressor ? 'compress-file-input' : 'convert-file-input';
+                const resultDivId = isCompressor ? 'compress-result' : 'convert-result';
+
+                const processFile = file => {
+                    if (!file || !file.type.startsWith('image/')) return;
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const originalSize = (file.size / 1024).toFixed(2);
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width; canvas.height = img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+
+                            let dataUrl, fileName, newSize;
+                            if (isCompressor) {
+                                const quality = parseFloat(document.getElementById('quality-slider').value) / 100;
+                                dataUrl = canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', quality);
+                                newSize = (dataUrl.length * 0.75 / 1024).toFixed(2);
+                                fileName = `compressed-${file.name}`;
+                            } else {
+                                const format = document.getElementById('convert-format').value;
+                                const ext = format.split('/')[1];
+                                dataUrl = canvas.toDataURL(format);
+                                newSize = (dataUrl.length * 0.75 / 1024).toFixed(2);
+                                fileName = `${file.name.split('.')[0]}.${ext}`;
+                            }
+                            
+                            const resultDiv = document.getElementById(resultDivId);
+                            resultDiv.innerHTML = `<img src="${dataUrl}" alt="Processed Image" style="max-width:100%; border-radius:5px; margin-top:10px;"><p>Original: ${originalSize} KB | New Size: ${newSize} KB</p><a href="${dataUrl}" download="${fileName}" class="tool-button">Download Image</a>`;
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                };
+                setupDragDrop(dropAreaId, inputId, processFile);
+                if (isCompressor) document.getElementById('quality-slider').addEventListener('input', () => document.getElementById('quality-value').textContent = document.getElementById('quality-slider').value);
+
+            } else if (toolId === 'qr-generator') {
+                 const generate = () => {
+                    const text = document.getElementById('qr-text').value;
+                    const container = document.getElementById('qrcode');
+                    container.innerHTML = '';
+                    if (text && typeof QRCode !== 'undefined') new QRCode(container, { text, width: 200, height: 200, colorDark : "#ffffff", colorLight : "transparent" });
+                };
+                 if (typeof QRCode === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js';
+                    document.head.appendChild(script);
+                    script.onload = () => { generate(); document.getElementById('qr-text').addEventListener('input', generate); };
+                } else { generate(); document.getElementById('qr-text').addEventListener('input', generate); }
+            
+            } else if (toolId === 'password-generator') {
+                const lengthSlider = document.getElementById('password-length');
+                const lengthVal = document.getElementById('pass-length-val');
+                const passwordEl = document.getElementById('generated-password');
+                const generate = () => {
+                    const length = lengthSlider.value;
+                    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+                    let password = "";
+                    for (let i = 0; i < length; ++i) password += charset.charAt(Math.floor(Math.random() * charset.length));
+                    passwordEl.textContent = password;
+                };
+                lengthSlider.addEventListener('input', () => { lengthVal.textContent = lengthSlider.value; generate(); });
+                document.getElementById('generate-password').addEventListener('click', generate);
+                passwordEl.addEventListener('click', () => { navigator.clipboard.writeText(passwordEl.textContent).then(() => { passwordEl.title="Copied!"; setTimeout(() => passwordEl.title="Click to copy", 1000); }); });
+                generate();
+            
+            } else if (toolId === 'text-to-speech') {
+                const speakBtn = document.getElementById('speak-btn');
+                const downloadBtn = document.getElementById('download-tts-btn');
+                const ttsInput = document.getElementById('tts-input');
+                const ttsStatus = document.getElementById('tts-status');
+                const synth = window.speechSynthesis;
+
+                if (window.isSecureContext) {
+                    downloadBtn.disabled = false;
+                    downloadBtn.title = 'Download the speech as an audio file';
+                } else {
+                    ttsStatus.textContent = "Download is disabled when running from a local file.";
+                }
+
+                const speak = () => {
+                    if (synth.speaking) {
+                        synth.cancel();
+                    }
+                    if (ttsInput.value !== '') {
+                        const utterance = new SpeechSynthesisUtterance(ttsInput.value);
+                        utterance.onerror = (event) => {
+                            console.error('SpeechSynthesisUtterance.onerror', event);
+                            ttsStatus.textContent = 'An error occurred during speech.';
+                        };
+                        synth.speak(utterance);
+                    }
+                };
+
+                speakBtn.addEventListener('click', () => {
+                    if (!('speechSynthesis' in window)) {
+                        ttsStatus.textContent = 'Sorry, your browser does not support text to speech!';
+                        return;
+                    }
+                    if (synth.getVoices().length === 0) {
+                        synth.onvoiceschanged = speak;
+                    } else {
+                        speak();
+                    }
+                });
+
+                downloadBtn.addEventListener('click', async () => {
+                    if (ttsInput.value.trim() === '') {
+                        ttsStatus.textContent = 'Please enter some text to download.';
+                        return;
+                    }
+
+                    try {
+                        ttsStatus.textContent = "Please grant permission and select 'Tab audio' to record.";
+                        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+                        const audioStream = new MediaStream(stream.getAudioTracks());
+                        const recorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' });
+                        const chunks = [];
+
+                        recorder.ondataavailable = e => chunks.push(e.data);
+                        
+                        recorder.onstop = () => {
+                            const blob = new Blob(chunks, { 'type' : 'audio/webm' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'speech.webm';
+                            a.className = 'tool-button';
+                            a.textContent = 'Download speech.webm';
+                            ttsStatus.innerHTML = '';
+                            ttsStatus.appendChild(a);
+                            stream.getTracks().forEach(track => track.stop());
+                        };
+                        
+                        const utterance = new SpeechSynthesisUtterance(ttsInput.value);
+                        utterance.onend = () => {
+                           if (recorder.state === "recording") {
+                               recorder.stop();
+                           }
+                        };
+                        
+                        utterance.onerror = () => {
+                            ttsStatus.textContent = "Error during speech, stopping recording.";
+                            if (recorder.state === "recording") {
+                                recorder.stop();
+                            }
+                        };
+
+                        recorder.start();
+                        ttsStatus.textContent = 'Recording... Speech will start now.';
+                        synth.speak(utterance);
+
+                    } catch (err) {
+                        console.error("Error capturing audio:", err);
+                        ttsStatus.textContent = 'Permission denied or error capturing audio.';
+                    }
+                });
+            } else if (toolId === 'speech-to-text') {
+                const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const sttResult = document.getElementById('stt-result');
+                const sttError = document.getElementById('stt-error');
+                const sttBtn = document.getElementById('stt-btn');
+
+                if (SpeechRec) {
+                    window.recognition = new SpeechRec();
+                    let listening = false;
+                    let final_transcript = '';
+
+                    recognition.continuous = true;
+                    recognition.interimResults = true;
+
+                    recognition.onstart = () => {
+                        listening = true;
+                        sttBtn.textContent = 'Stop Listening';
+                        sttError.textContent = '';
+                    };
+
+                    recognition.onend = () => {
+                        listening = false;
+                        sttBtn.textContent = 'Start Listening';
+                    };
+
+                    recognition.onerror = (event) => {
+                        if (event.error == 'no-speech' || event.error == 'audio-capture' || event.error == 'not-allowed') {
+                             sttError.textContent = `Error: ${event.error}. Please check microphone permissions.`;
+                        }
+                    };
+                    
+                    recognition.onresult = (event) => {
+                        let interim_transcript = '';
+                        for (let i = event.resultIndex; i < event.results.length; ++i) {
+                            if (event.results[i].isFinal) {
+                                final_transcript += event.results[i][0].transcript + ' ';
+                            } else {
+                                interim_transcript += event.results[i][0].transcript;
+                            }
+                        }
+                        sttResult.textContent = final_transcript + interim_transcript;
+                    };
+
+                    sttBtn.addEventListener('click', () => {
+                        if (listening) {
+                            recognition.stop();
+                        } else {
+                            final_transcript = sttResult.textContent;
+                            recognition.start();
+                        }
+                    });
+                } else {
+                    sttResult.textContent = "Sorry, Speech Recognition is not supported in your browser.";
+                    sttBtn.disabled = true;
+                }
+            } else if (toolId === 'timer-stopwatch') {
+                 let timer, startTime, elapsedTime = 0;
+                const display = document.getElementById('stopwatch-display');
+                const startStopBtn = document.getElementById('start-stop-btn');
+                const resetBtn = document.getElementById('reset-btn');
+
+                const formatTime = (time) => {
+                    const ms = String(time % 1000).padStart(3, '0');
+                    const s = String(Math.floor(time / 1000) % 60).padStart(2, '0');
+                    const m = String(Math.floor(time / 60000) % 60).padStart(2, '0');
+                    return `${m}:${s}:${ms}`;
+                };
+                const updateDisplay = () => display.textContent = formatTime(elapsedTime + (Date.now() - startTime));
+                startStopBtn.addEventListener('click', () => {
+                    if (timer) {
+                        clearInterval(timer); timer = null;
+                        elapsedTime += Date.now() - startTime;
+                        startStopBtn.textContent = 'Start';
+                    } else {
+                        startTime = Date.now();
+                        timer = setInterval(updateDisplay, 10);
+                        startStopBtn.textContent = 'Stop';
+                    }
+                });
+                resetBtn.addEventListener('click', () => {
+                    clearInterval(timer); timer = null; elapsedTime = 0;
+                    startStopBtn.textContent = 'Start';
+                    display.textContent = formatTime(0);
+                });
+            } else {
+                const simpleTools = {
+                    'json-formatter': () => document.getElementById('format-json').addEventListener('click', () => {
+                        const input = document.getElementById('json-input');
+                        try {
+                            input.classList.remove('error');
+                            input.value = JSON.stringify(JSON.parse(input.value), null, 4);
+                        } catch (e) { input.classList.add('error'); }
+                    }),
+                    'word-counter': () => document.getElementById('text-input').addEventListener('input', e => {
+                        const text = e.target.value;
+                        document.getElementById('char-count').textContent = text.length;
+                        document.getElementById('word-count').textContent = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+                    }),
+                    'color-picker': () => {
+                        const colorInput = document.getElementById('color-input');
+                        const valuesDiv = document.getElementById('color-values');
+                        const update = () => {
+                            const hex = colorInput.value;
+                            const r = parseInt(hex.substr(1, 2), 16);
+                            const g = parseInt(hex.substr(3, 2), 16);
+                            const b = parseInt(hex.substr(5, 2), 16);
+                            valuesDiv.innerHTML = `<p><strong>HEX:</strong> ${hex}</p><p><strong>RGB:</strong> rgb(${r}, ${g}, ${b})</p>`;
+                        };
+                        colorInput.addEventListener('input', update);
+                        update();
+                    },
+                    'age-calculator': () => document.getElementById('calculate-age').addEventListener('click', () => {
+                        const birthdateInput = document.getElementById('birthdate').value;
+                        const resultElement = document.getElementById('age-result');
+                        if (!birthdateInput) { resultElement.textContent = 'Please enter date.'; return; }
+                        const birthDate = new Date(birthdateInput);
+                        const today = new Date();
+                        let years = today.getFullYear() - birthDate.getFullYear();
+                        let months = today.getMonth() - birthDate.getMonth();
+                        let days = today.getDate() - birthDate.getDate();
+                        if (days < 0) { months--; days += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); }
+                        if (months < 0) { years--; months += 12; }
+                        resultElement.textContent = `${years}y, ${months}m, ${days}d old.`;
+                    }),
+                    'bmi-calculator': () => document.getElementById('calculate-bmi').addEventListener('click', () => {
+                        const height = parseFloat(document.getElementById('height').value);
+                        const weight = parseFloat(document.getElementById('weight').value);
+                        const resultEl = document.getElementById('bmi-result');
+                        if (height > 0 && weight > 0) {
+                            const bmi = (weight / ((height / 100) ** 2)).toFixed(1);
+                            let cat = bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Normal' : bmi < 30 ? 'Overweight' : 'Obesity';
+                            resultEl.innerHTML = `BMI is <strong>${bmi}</strong> (${cat})`;
+                        } else { resultEl.textContent = 'Enter valid numbers.'; }
+                    })
+                };
+                if (simpleTools[toolId]) simpleTools[toolId]();
+            }
+        };
+    });
+    </script>
+    
+    <!-- AD SCRIPT: type attribute restored to ensure ads load -->
+    <script type='text/javascript' src='//pl27659104.revenuecpmgate.com/1b/9a/e9/1b9ae9b5367786e61753718dab6de5cf.js'></script>
+
+
+</body>
+</html>
